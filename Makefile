@@ -27,6 +27,8 @@ src/$(LIBNAME): $(OBJS)
 install:
 	mkdir -p $(LUA_LIBDIR)/luasql
 	cp src/$(LIBNAME) $(LUA_LIBDIR)/luasql
+	mkdir -p $(LUA_DIR)/luasql
+	cp init.lua $(LUA_DIR)/luasql/
 
 jdbc_driver:
 	cd src/jdbc; make $@
