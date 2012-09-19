@@ -22,7 +22,7 @@ RANLIB= ranlib
 lib: src/$(LIBNAME)
 
 src/$(LIBNAME): $(OBJS)
-	export MACOSX_DEPLOYMENT_TARGET="10.3"; $(CC) $(CFLAGS) -o $@ $(LIB_OPTION) $(OBJS) $(DRIVER_LIBS)
+	export MACOSX_DEPLOYMENT_TARGET="10.8"; $(CC) $(CFLAGS) -o $@ $(LIB_OPTION) $(OBJS) $(DRIVER_LIBS)
 
 install:
 	mkdir -p $(LUA_LIBDIR)/luasql

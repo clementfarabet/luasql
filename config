@@ -15,20 +15,20 @@ T= mysql
 PREFIX = /usr/local
 
 # System's libraries directory (where binary libraries are installed)
-LUA_LIBDIR= $(PREFIX)/lib/lua/5.1
+LUA_LIBDIR= $(PREFIX)/lib/torch
 
 # System's lua directory (where Lua libraries are installed)
-LUA_DIR= $(PREFIX)/share/lua/5.1
+LUA_DIR= $(PREFIX)/share/torch/lua
 
 # Lua includes directory
-LUA_INC= $(PREFIX)/include
+LUA_INC= $(PREFIX)/include/torch
 
 # Lua version number (first and second digits of target version)
 LUA_VERSION_NUM= 501
 
 # OS dependent
-LIB_OPTION= -shared #for Linux
-#LIB_OPTION= -bundle -undefined dynamic_lookup #for MacOS X
+#LIB_OPTION= -shared #for Linux
+LIB_OPTION= -bundle -undefined dynamic_lookup #for MacOS X
 
 LIBNAME= $T.so
 
