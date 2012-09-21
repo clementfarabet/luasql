@@ -36,6 +36,7 @@ local function create(db, args)
    -- parse args
    local tbl = args.table
    local columns = args.columns -- a table of {name,type} entries
+   local pkey = args.primarykey
 
    -- table -> string
    local declarations = {}
@@ -44,7 +45,12 @@ local function create(db, args)
       table.insert(declarations, fentry)
    end
    declarations = table.concat(declarations, ',')
-   
+
+   -- primary key?
+   if pkey then
+      declarations = declarations .. ', primary key (' .. pkey .. ')'
+   end
+
    -- build cmd
    local cmd = string.format("CREATE TABLE %s(%s)", tbl, declarations)
 
@@ -98,6 +104,35 @@ local function insert(db, args)
    return res
 end
 
+local function replace(db, args)
+   -- parse args
+   local tbl = args.table
+   local entries = args.entries
+
+   -- one cmd / entry
+   local res,err
+   for i,entry in ipairs(entries) do
+      -- flatten entry
+      local fentry = {}
+      for k,v in pairs(entry) do
+         table.insert(fentry, k .. ' = "' .. v .. '"')
+      end
+      fentry = table.concat(fentry, ', ')
+
+      -- build cmd
+      local cmd = string.format("REPLACE INTO %s SET %s", tbl, fentry)
+
+      -- exec cmd
+      res,err = db.conn:execute(cmd)
+      if err then break end
+   end
+
+   -- error?
+   if err then print(err)
+   else print('LuaSQL: replaced ' .. #entries .. ' entries into table ' .. tbl) end
+   return res
+end
+
 local function select(db, args)
    -- parse args
    local tbl = args.table
@@ -148,6 +183,7 @@ function luasql.connect(args)
       create = create,
       drop = drop,
       insert = insert,
+      replace = replace,
       select = select
    }
    return db

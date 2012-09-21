@@ -11,8 +11,9 @@ db:create{
    table='people', 
    columns={
       {'name', 'varchar(50)'}, 
-      {'email', 'varchar(50)'} 
-   }
+      {'email', 'varchar(50)'}
+   },
+   primarykey='name'
 }
 
 db:insert{
@@ -20,6 +21,13 @@ db:insert{
    entries={
       {name='Paul Johnson', email='paul@js.com'},
       {name='Clement Farabet', email='clement@gmail.com'}
+   }
+}
+
+db:replace{
+   table='people',
+   entries={
+      {name='Clement Farabet', email='clement.farabet@gmail.com'}
    }
 }
 
