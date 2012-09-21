@@ -35,8 +35,17 @@ luasql = {}
 local function create(db, args)
    -- parse args
    local tbl = args.table
-   local columns = args.columns -- a table of {name,type} entries
+   local columns = args.columns -- a table of {name,type} entries, or name=type entries
    local pkey = args.primarykey
+
+   -- are columns sorted?
+   if not columns[1] then
+      local c = columns
+      columns = {}
+      for k,v in pairs(c) do
+         table.insert(columns, {k,v})
+      end
+   end
 
    -- table -> string
    local declarations = {}
@@ -58,6 +67,41 @@ local function create(db, args)
    local res,err = db.conn:execute(cmd)
    if err then print(err)
    else print('LuaSQL: created table ' .. tbl) end
+   return res
+end
+
+local function alter(db, args)
+   -- parse args
+   local tbl = args.table
+   local columns = args.columns -- a table of entries to alter
+
+   -- are columns sorted?
+   if not columns[1] then
+      local c = columns
+      columns = {}
+      for k,v in pairs(c) do
+         table.insert(columns, {k,v})
+      end
+   end
+
+   -- actions
+   local actions = {}
+   for i,column in ipairs(columns) do
+      if column[2] ~= '' then
+         actions[i] = 'add ' .. table.concat(column, ' ')
+      else
+         actions[i] = 'drop ' .. column[1]
+      end
+   end
+   actions = table.concat(actions,', ')
+
+   -- build cmd
+   local cmd = string.format("ALTER TABLE %s %s", tbl, actions)
+
+   -- execute cmd
+   local res,err = db.conn:execute(cmd)
+   if err then print(err)
+   else print('LuaSQL: altered table ' .. tbl) end
    return res
 end
 
@@ -104,7 +148,7 @@ local function insert(db, args)
    return res
 end
 
-local function replace(db, args)
+local function update(db, args)
    -- parse args
    local tbl = args.table
    local entries = args.entries
@@ -129,7 +173,7 @@ local function replace(db, args)
 
    -- error?
    if err then print(err)
-   else print('LuaSQL: replaced ' .. #entries .. ' entries into table ' .. tbl) end
+   else print('LuaSQL: updated ' .. #entries .. ' entries into table ' .. tbl) end
    return res
 end
 
@@ -182,8 +226,9 @@ function luasql.connect(args)
       conn = conn,
       create = create,
       drop = drop,
+      alter = alter,
       insert = insert,
-      replace = replace,
+      update = update,
       select = select
    }
    return db
